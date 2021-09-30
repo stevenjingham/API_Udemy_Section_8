@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask
 from flask_restful import Api
 from flask_jwt import JWT
@@ -10,7 +12,11 @@ from resources.store import Store, StoreList
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
+db_url = os.environ.get('DATABASE_URL') ## SI Code - see comment in 119 "SQLAlchemy cant load plugin for postgres"
+if db_url: ## uses environemtn database. If not found uses sqlite database for local work. See video/comments 118
+    app.config['SQLALCHEMY_DATABASE_URI'] = db_url.replace("://", "ql://", 1) 
+else:
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = 'steve'
 api = Api(app)
